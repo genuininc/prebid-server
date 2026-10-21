@@ -1,0 +1,10 @@
+<VAST version="3.0">
+  <Ad id="wr-1">
+    <Wrapper>
+      <AdSystem>Genuin</AdSystem>
+      <VASTAdTagURI><![CDATA[https://nxs.example.test/next]]></VASTAdTagURI>
+      <Pricing model="cpm" currency="usd">1.75</Pricing>
+      <Impression><![CDATA[https://nxs.example.test/imp]]></Impression>
+    </Wrapper>
+  </Ad>
+</VAST>

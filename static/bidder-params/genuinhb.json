@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "GenuinHB Adapter Params",
+  "description": "A schema which validates params accepted by the GenuinHB adapter",
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "description": "Genuin ad server customer ID, used as the {customerId} path segment of the VAST tag URL",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "tagId": {
+      "type": "string",
+      "description": "Genuin ad server tag ID, used as the {tagId} path segment of the VAST tag URL",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    }
+  },
+  "required": [
+    "customerId",
+    "tagId"
+  ]
+}

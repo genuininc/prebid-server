@@ -1,0 +1,33 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "site": {
+      "page": "https://publisher.example/watch"
+    },
+    "imp": [
+      {
+        "id": "test-imp-id",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480
+        },
+        "ext": {
+          "bidder": {
+            "tagId": "3753"
+          }
+        }
+      }
+    ]
+  },
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: customerId is required and must be 1-64 characters from [A-Za-z0-9_-]",
+      "comparison": "literal"
+    }
+  ],
+  "httpCalls": [],
+  "expectedBidResponses": []
+}

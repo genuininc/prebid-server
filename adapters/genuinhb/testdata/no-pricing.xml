@@ -1,0 +1,17 @@
+<VAST version="4.1">
+  <Ad>
+    <InLine>
+      <AdSystem>Genuin</AdSystem>
+      <Creatives>
+        <Creative id="cr-np">
+          <Linear>
+            <Duration>00:00:30.500</Duration>
+            <MediaFiles>
+              <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.example.test/ad.mp4]]></MediaFile>
+            </MediaFiles>
+          </Linear>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>

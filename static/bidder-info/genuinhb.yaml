@@ -1,0 +1,25 @@
+# GenuinHB: Genuin's own ad server. PBS calls the VAST tag
+# GET {endpoint}/tagxml/customer/{customerId}/tag/{tagId} and turns the returned VAST into a bid.
+# {{.AccountID}} = customerId, {{.AdUnit}} = tagId (both path-escaped by the adapter).
+# The default below is the QA host. Set adapters.genuinhb.endpoint (or PBS_ADAPTERS_GENUINHB_ENDPOINT)
+# per environment.
+endpoint: "https://nxs.qa.begenuin.com/tagxml/customer/{{.AccountID}}/tag/{{.AdUnit}}"
+# Optional host-level fallback price used when the VAST has no <Pricing> element, e.g.
+#   adapters.genuinhb.extra_info: '{"default_price": 0.50, "currency": "USD"}'
+maintainer:
+  email: "nayan@begenuin.com"
+geoscope:
+  - global
+# Genuin owns this VAST, so PBS may inject its /event impression tracker into it.
+modifyingVastXmlAllowed: true
+openrtb:
+  version: 2.6
+capabilities:
+  app:
+    mediaTypes:
+      - video
+      - audio
+  site:
+    mediaTypes:
+      - video
+      - audio

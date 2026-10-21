@@ -1,0 +1,48 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "imp": [
+      {
+        "id": "test-imp-id",
+        "video": {
+          "mimes": ["video/mp4"],
+          "protocols": [2, 3, 5, 6],
+          "w": 640,
+          "h": 480
+        },
+        "ext": {
+          "bidder": {
+            "customerId": "3119",
+            "tagId": "3753"
+          }
+        }
+      }
+    ],
+    "site": {
+      "page": "https://publisher.example/watch",
+      "publisher": { "id": "1001" }
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+      "ip": "203.0.113.7"
+    }
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://nxs.example.test/tagxml/customer/3119/tag/3753",
+        "headers": {
+          "Accept": ["application/xml"],
+          "User-Agent": ["Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)"],
+          "X-Forwarded-For": ["203.0.113.7"],
+          "Referer": ["https://publisher.example/watch"]
+        },
+        "impIDs": ["test-imp-id"]
+      },
+      "mockResponse": {
+        "status": 204
+      }
+    }
+  ],
+  "expectedBidResponses": []
+}
