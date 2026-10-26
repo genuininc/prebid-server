@@ -17,6 +17,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync/atomic"
 	"syscall"
 	"testing"
 	"time"
@@ -3568,5 +3569,184 @@ func BenchmarkCompressToGZIPOptimized(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		getRequestBody(req, "GZIP")
+	}
+}
+
+// TestNoRequestSingleBidder makes sure a request marked NoRequest is never sent over the network, and that
+// MakeBids is still handed a synthetic 200 response whose bids flow through like any other.
+func TestNoRequestSingleBidder(t *testing.T) {
+	var hits atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(200)
+	}))
+	defer server.Close()
+
+	bidderImpl := &goodSingleBidder{
+		httpRequest: &adapters.RequestData{
+			NoRequest: true,
+			Uri:       "https://example.invalid/synthetic",
+			ImpIDs:    []string{"impId"},
+		},
+		bidResponse: &adapters.BidderResponse{
+			Bids: []*adapters.TypedBid{{
+				Bid:     &openrtb2.Bid{ImpID: "impId", Price: 1.5},
+				BidType: openrtb_ext.BidTypeVideo,
+			}},
+		},
+	}
+
+	bidder := AdaptBidder(bidderImpl, server.Client(), &config.Configuration{}, &metricsConfig.NilMetricsEngine{}, openrtb_ext.BidderAppnexus, nil, "")
+	currencyConverter := currency.NewRateConverter(&http.Client{}, time.Duration(1), "", time.Duration(0))
+	bidderReq := BidderRequest{
+		BidRequest: &openrtb2.BidRequest{Imp: []openrtb2.Imp{{ID: "impId"}}},
+		BidderName: "test",
+	}
+	bidReqOptions := bidRequestOptions{bidAdjustments: map[string]float64{"test": 1.0}}
+	seatBids, extraBidderRespInfo, errs := bidder.requestBid(context.Background(), bidderReq, currencyConverter.Rates(), &adapters.ExtraRequestInfo{}, &adscert.NilSigner{}, bidReqOptions, openrtb_ext.ExtAlternateBidderCodes{}, &hookexecution.EmptyHookExecutor{}, nil)
+
+	assert.Empty(t, errs)
+	assert.Equal(t, int32(0), hits.Load(), "a NoRequest request must not reach the server")
+	assert.Len(t, seatBids, 1)
+	if assert.Len(t, seatBids[0].Bids, 1) {
+		assert.Same(t, bidderImpl.bidResponse.Bids[0].Bid, seatBids[0].Bids[0].Bid)
+	}
+	assert.False(t, extraBidderRespInfo.respProcessingStartTime.IsZero())
+	assert.Equal(t, &adapters.ResponseData{StatusCode: 200, Body: []byte{}, Headers: http.Header{}}, bidderImpl.httpResponse, "MakeBids should receive the synthetic response")
+}
+
+// TestNoRequestMixedWithOrdinaryRequest makes sure a NoRequest request and an ordinary request returned by the
+// same MakeRequests call both produce bids, and only the ordinary one reaches the server.
+func TestNoRequestMixedWithOrdinaryRequest(t *testing.T) {
+	var hits atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(200)
+		w.Write([]byte(`{"bid":true}`))
+	}))
+	defer server.Close()
+
+	bidderImpl := &goodMultiHTTPCallsBidder{
+		httpRequest: []*adapters.RequestData{
+			{
+				NoRequest: true,
+				Uri:       "https://example.invalid/synthetic",
+				ImpIDs:    []string{"impId"},
+			},
+			{
+				Method:  "POST",
+				Uri:     server.URL,
+				Body:    []byte(`{"key":"val"}`),
+				Headers: http.Header{},
+				ImpIDs:  []string{"impId"},
+			},
+		},
+		bidResponses: []*adapters.BidderResponse{
+			{Bids: []*adapters.TypedBid{{Bid: &openrtb2.Bid{ImpID: "impId", Price: 1.0}, BidType: openrtb_ext.BidTypeVideo}}},
+			{Bids: []*adapters.TypedBid{{Bid: &openrtb2.Bid{ImpID: "impId", Price: 2.0}, BidType: openrtb_ext.BidTypeBanner}}},
+		},
+	}
+
+	bidder := AdaptBidder(bidderImpl, server.Client(), &config.Configuration{}, &metricsConfig.NilMetricsEngine{}, openrtb_ext.BidderAppnexus, nil, "")
+	currencyConverter := currency.NewRateConverter(&http.Client{}, time.Duration(1), "", time.Duration(0))
+	bidderReq := BidderRequest{
+		BidRequest: &openrtb2.BidRequest{Imp: []openrtb2.Imp{{ID: "impId"}}},
+		BidderName: "test",
+	}
+	bidReqOptions := bidRequestOptions{bidAdjustments: map[string]float64{"test": 1.0}}
+	seatBids, _, errs := bidder.requestBid(context.Background(), bidderReq, currencyConverter.Rates(), &adapters.ExtraRequestInfo{}, &adscert.NilSigner{}, bidReqOptions, openrtb_ext.ExtAlternateBidderCodes{}, &hookexecution.EmptyHookExecutor{}, nil)
+
+	assert.Empty(t, errs)
+	assert.Equal(t, int32(1), hits.Load(), "only the ordinary request should reach the server")
+	assert.Len(t, seatBids, 1)
+	assert.Len(t, seatBids[0].Bids, 2)
+	if assert.Len(t, bidderImpl.httpResponses, 2) {
+		// The two responses arrive in scheduling order; one is synthetic, one is the server's.
+		responseBodies := []string{string(bidderImpl.httpResponses[0].Body), string(bidderImpl.httpResponses[1].Body)}
+		assert.ElementsMatch(t, []string{"", `{"bid":true}`}, responseBodies)
+	}
+}
+
+// TestNoRequestDebugHttpCall makes sure a NoRequest request shows up in the debug output with its URI, a 200
+// status and empty bodies.
+func TestNoRequestDebugHttpCall(t *testing.T) {
+	bidderImpl := &goodSingleBidder{
+		httpRequest: &adapters.RequestData{
+			NoRequest: true,
+			Uri:       "https://example.invalid/synthetic",
+			ImpIDs:    []string{"impId"},
+		},
+		bidResponse: &adapters.BidderResponse{Bids: []*adapters.TypedBid{}},
+	}
+
+	bidder := AdaptBidder(bidderImpl, &http.Client{}, &config.Configuration{}, &metricsConfig.NilMetricsEngine{}, openrtb_ext.BidderAppnexus, &config.DebugInfo{Allow: true}, "")
+	currencyConverter := currency.NewRateConverter(&http.Client{}, time.Duration(1), "", time.Duration(0))
+	bidderReq := BidderRequest{
+		BidRequest: &openrtb2.BidRequest{Imp: []openrtb2.Imp{{ID: "impId"}}},
+		BidderName: "test",
+	}
+	bidReqOptions := bidRequestOptions{
+		accountDebugAllowed: true,
+		bidAdjustments:      map[string]float64{"test": 1.0},
+	}
+	seatBids, _, errs := bidder.requestBid(context.Background(), bidderReq, currencyConverter.Rates(), &adapters.ExtraRequestInfo{}, &adscert.NilSigner{}, bidReqOptions, openrtb_ext.ExtAlternateBidderCodes{}, &hookexecution.EmptyHookExecutor{}, nil)
+
+	assert.Empty(t, errs)
+	assert.Len(t, seatBids, 1)
+	if assert.Len(t, seatBids[0].HttpCalls, 1) {
+		httpCall := seatBids[0].HttpCalls[0]
+		assert.Equal(t, "https://example.invalid/synthetic", httpCall.Uri)
+		assert.Equal(t, 200, httpCall.Status)
+		assert.Empty(t, httpCall.RequestBody)
+		assert.Empty(t, httpCall.ResponseBody)
+	}
+}
+
+// TestNoRequestContextDone makes sure a NoRequest request still respects an auction that is already over:
+// MakeBids is not called, the error is a timeout and the imp is recorded as a non-bid.
+func TestNoRequestContextDone(t *testing.T) {
+	expiredCtx, cancelExpired := context.WithDeadline(context.Background(), time.Now().Add(-7*time.Hour))
+	defer cancelExpired()
+	cancelledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	testCases := []struct {
+		description string
+		ctx         context.Context
+	}{
+		{description: "deadline-exceeded", ctx: expiredCtx},
+		{description: "cancelled", ctx: cancelledCtx},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.description, func(t *testing.T) {
+			bidderImpl := &goodSingleBidder{
+				httpRequest: &adapters.RequestData{
+					NoRequest: true,
+					Uri:       "https://example.invalid/synthetic",
+					ImpIDs:    []string{"impId"},
+				},
+				bidResponse: &adapters.BidderResponse{
+					Bids: []*adapters.TypedBid{{Bid: &openrtb2.Bid{ImpID: "impId"}, BidType: openrtb_ext.BidTypeVideo}},
+				},
+			}
+
+			bidder := AdaptBidder(bidderImpl, &http.Client{}, &config.Configuration{}, &metricsConfig.NilMetricsEngine{}, openrtb_ext.BidderAppnexus, nil, "")
+			currencyConverter := currency.NewRateConverter(&http.Client{}, time.Duration(1), "", time.Duration(0))
+			bidderReq := BidderRequest{
+				BidRequest: &openrtb2.BidRequest{Imp: []openrtb2.Imp{{ID: "impId"}}},
+				BidderName: "test",
+			}
+			bidReqOptions := bidRequestOptions{bidAdjustments: map[string]float64{"test": 1.0}}
+			seatBids, extraBidderRespInfo, errs := bidder.requestBid(test.ctx, bidderReq, currencyConverter.Rates(), &adapters.ExtraRequestInfo{}, &adscert.NilSigner{}, bidReqOptions, openrtb_ext.ExtAlternateBidderCodes{}, &hookexecution.EmptyHookExecutor{}, nil)
+
+			if assert.Len(t, errs, 1) {
+				assert.IsType(t, &errortypes.Timeout{}, errs[0])
+			}
+			assert.Len(t, seatBids, 1)
+			assert.Empty(t, seatBids[0].Bids)
+			assert.Nil(t, bidderImpl.httpResponse, "MakeBids must not be called once the auction is over")
+			assert.Equal(t, SeatNonBidBuilder{"test": {{ImpId: "impId", StatusCode: int(ErrorTimeout)}}}, extraBidderRespInfo.seatNonBidBuilder)
+		})
 	}
 }

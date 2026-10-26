@@ -1,0 +1,51 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "storeurl": "https://apps.apple.com/app/id000000000",
+      "publisher": {
+        "id": "1001"
+      }
+    },
+    "device": {
+      "ua": "GenuinApp/1.0",
+      "ip": "203.0.113.7",
+      "lmt": 0
+    },
+    "regs": {
+      "gdpr": 1,
+      "us_privacy": "1YNN"
+    },
+    "user": {
+      "consent": "CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA"
+    },
+    "imp": [
+      {
+        "id": "pre-1",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480,
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "customerId": "3119",
+            "tagId": "3753"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: adUnitPath is required and cpm must be greater than 0 for the gam-wrapper source",
+      "comparison": "literal"
+    }
+  ]
+}

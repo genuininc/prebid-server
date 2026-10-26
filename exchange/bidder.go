@@ -579,6 +579,29 @@ func (bidder *BidderAdapter) doRequest(ctx context.Context, req *adapters.Reques
 }
 
 func (bidder *BidderAdapter) doRequestImpl(ctx context.Context, req *adapters.RequestData, logger util.LogMsg, bidderRequestStartTime time.Time, tmaxAdjustments *TmaxAdjustmentsPreprocessed) *httpCallInfo {
+	// A request marked NoRequest is never sent. MakeBids is handed a synthetic 200 with an empty body
+	// instead, so bids built entirely from the request still flow through the exchange. There is no
+	// network latency to protect against, so the tmax gate is skipped. A context that is already done
+	// yields a Timeout error whether it was cancelled or expired (the ordinary path maps only an
+	// expired deadline to Timeout); server-response-time metrics are not recorded, there was no server.
+	if req.NoRequest {
+		bidder.me.RecordOverheadTime(metrics.PreBidder, time.Since(bidderRequestStartTime))
+		if err := ctx.Err(); err != nil {
+			return &httpCallInfo{
+				request: req,
+				err:     &errortypes.Timeout{Message: err.Error()},
+			}
+		}
+		return &httpCallInfo{
+			request: req,
+			response: &adapters.ResponseData{
+				StatusCode: http.StatusOK,
+				Body:       []byte{},
+				Headers:    http.Header{},
+			},
+		}
+	}
+
 	requestBody, err := getRequestBody(req, bidder.config.EndpointCompression)
 	if err != nil {
 		return &httpCallInfo{

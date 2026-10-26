@@ -1,0 +1,49 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "storeurl": "https://apps.apple.com/app/id000000000",
+      "publisher": {
+        "id": "1001"
+      }
+    },
+    "device": {
+      "ua": "GenuinApp/1.0",
+      "ip": "203.0.113.7",
+      "lmt": 0
+    },
+    "regs": {
+      "gdpr": 1,
+      "us_privacy": "1YNN"
+    },
+    "user": {
+      "consent": "CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA"
+    },
+    "imp": [
+      {
+        "id": "nosize",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "adUnitPath": "/21775744923/genuin/instream",
+            "cpm": 0.5
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: no GAM wrapper bid: imp \"nosize\": video.w and video.h are required to build a GAM tag",
+      "comparison": "literal"
+    }
+  ]
+}

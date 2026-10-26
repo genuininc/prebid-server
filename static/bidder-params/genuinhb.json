@@ -1,26 +1,73 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "GenuinHB Adapter Params",
-  "description": "A schema which validates params accepted by the GenuinHB adapter",
+  "description": "A schema which validates params accepted by the GenuinHB adapter and its aliases. The shape depends on the alias's source type: vast-tag (customerId, tagId) or gam-wrapper (adUnitPath, cpm, custParams, descriptionUrl).",
   "type": "object",
   "properties": {
     "customerId": {
       "type": "string",
-      "description": "Genuin ad server customer ID, used as the {customerId} path segment of the VAST tag URL",
+      "description": "vast-tag: Genuin ad server customer ID, used as the {customerId} path segment of the VAST tag URL",
       "minLength": 1,
       "maxLength": 64,
       "pattern": "^[A-Za-z0-9_-]+$"
     },
     "tagId": {
       "type": "string",
-      "description": "Genuin ad server tag ID, used as the {tagId} path segment of the VAST tag URL",
+      "description": "vast-tag: Genuin ad server tag ID, used as the {tagId} path segment of the VAST tag URL",
       "minLength": 1,
       "maxLength": 64,
       "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "adUnitPath": {
+      "type": "string",
+      "description": "gam-wrapper: Google Ad Manager ad unit path, e.g. /21775744923/genuin/instream (the iu parameter)",
+      "minLength": 3,
+      "maxLength": 200,
+      "pattern": "^/[0-9]+(,[0-9]+)?/[^\\s?#&]+$"
+    },
+    "cpm": {
+      "type": "number",
+      "description": "gam-wrapper: the price the GAM wrapper bid competes at (CPM, USD); policy, not a real bid",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    },
+    "custParams": {
+      "type": "object",
+      "description": "gam-wrapper: key-values sent to GAM as cust_params",
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 200,
+        "pattern": "^[^&=]*$"
+      }
+    },
+    "descriptionUrl": {
+      "type": "string",
+      "description": "gam-wrapper: the description_url sent to GAM; defaults to site.page, then app.storeurl",
+      "pattern": "^https?://[^\\s]+$"
+    },
+    "sizes": {
+      "type": "array",
+      "description": "gam-wrapper: extra GAM master video ad slot sizes (\"WxH\") offered after the imp's size in the tag's sz list; use the sizes the GAM line items are trafficked at",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]{1,5}x[0-9]{1,5}$"
+      },
+      "maxItems": 10,
+      "uniqueItems": true
     }
   },
-  "required": [
-    "customerId",
-    "tagId"
+  "anyOf": [
+    {
+      "required": [
+        "customerId",
+        "tagId"
+      ]
+    },
+    {
+      "required": [
+        "adUnitPath",
+        "cpm"
+      ]
+    }
   ]
 }

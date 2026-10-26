@@ -196,6 +196,7 @@ func (req *httpRequest) ToRequestData(t *testing.T) *adapters.RequestData {
 		Method: "POST",
 		Uri:    req.Uri,
 		Body:   req.Body,
+		ImpIDs: req.ImpIDs,
 	}
 }
 

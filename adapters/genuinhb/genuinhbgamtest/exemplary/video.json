@@ -1,0 +1,80 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "storeurl": "https://apps.apple.com/app/id000000000",
+      "publisher": {
+        "id": "1001"
+      }
+    },
+    "device": {
+      "ua": "GenuinApp/1.0",
+      "ip": "203.0.113.7",
+      "lmt": 0
+    },
+    "regs": {
+      "gdpr": 1,
+      "us_privacy": "1YNN"
+    },
+    "user": {
+      "consent": "CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA"
+    },
+    "imp": [
+      {
+        "id": "pre-1",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480,
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "adUnitPath": "/21775744923/genuin/instream",
+            "cpm": 0.5,
+            "custParams": {
+              "tier": "premium",
+              "gn_placement": "pre-1"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://pubads.g.doubleclick.net/gampad/ads?correlator=123456&cust_params=gn_placement%3Dpre-1%26tier%3Dpremium&description_url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000&env=vp&gdfp_req=1&gdpr=1&gdpr_consent=CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA&impl=s&iu=%2F21775744923%2Fgenuin%2Finstream&output=xml_vast4&sz=640x480&unviewed_position_start=1&url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000&us_privacy=1YNN&vpos=preroll",
+        "impIDs": [
+          "pre-1"
+        ]
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "gam-pre-1",
+            "impid": "pre-1",
+            "price": 0.5,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"gam-pre-1\"><Wrapper><AdSystem>GenuinHB</AdSystem><VASTAdTagURI><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?correlator=123456&cust_params=gn_placement%3Dpre-1%26tier%3Dpremium&description_url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000&env=vp&gdfp_req=1&gdpr=1&gdpr_consent=CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA&impl=s&iu=%2F21775744923%2Fgenuin%2Finstream&output=xml_vast4&sz=640x480&unviewed_position_start=1&url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000&us_privacy=1YNN&vpos=preroll]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "gam:/21775744923/genuin/instream",
+            "w": 640,
+            "h": 480,
+            "mtype": 2
+          },
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}

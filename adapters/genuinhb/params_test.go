@@ -42,6 +42,14 @@ var validParams = []string{
 	`{"customerId": "a", "tagId": "b"}`,
 	`{"customerId": "` + strings.Repeat("9", 64) + `", "tagId": "1"}`,
 	`{"customerId": "3119", "tagId": "3753", "unknown": true}`,
+	// gam-wrapper shape
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 0.01}`,
+	`{"adUnitPath": "/21775744923,12345/genuin/instream/pre", "cpm": 50}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1.5, "custParams": {"tier": "premium", "gn_placement": "pre-1"}}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1.5, "custParams": {}, "descriptionUrl": "https://www.begenuin.com/watch/demo"}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "custParams": {"color": "red,blue", "k": "a b"}}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": ["640x480", "400x300"]}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": []}`,
 }
 
 var invalidParams = []string{
@@ -68,4 +76,25 @@ var invalidParams = []string{
 	`{"customerId": "@evil.com", "tagId": "3753"}`,
 	`{"customerId": "3119", "tagId": "https://evil.com"}`,
 	`{"customerId": "` + strings.Repeat("9", 65) + `", "tagId": "1"}`,
+	// gam-wrapper shape, broken
+	`{"adUnitPath": "/21775744923/genuin/instream"}`,
+	`{"cpm": 1}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 0}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": -1}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": "1.5"}`,
+	`{"adUnitPath": "21775744923/genuin/instream", "cpm": 1}`,
+	`{"adUnitPath": "/21775744923/genuin instream", "cpm": 1}`,
+	`{"adUnitPath": "", "cpm": 1}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "custParams": {"tier": 1}}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "custParams": ["tier"]}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "custParams": {"k": "a&b"}}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "custParams": {"k": "a=b"}}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": "640x480"}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": ["640x480", "640x480"]}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": ["640 x 480"]}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "sizes": ["640x480|400x300"]}`,
+	`{"adUnitPath": "/21775744923/genuin/instream", "cpm": 1, "descriptionUrl": "not a url"}`,
+	// half of each shape
+	`{"customerId": "3119", "cpm": 1}`,
+	`{"tagId": "3753", "adUnitPath": "/21775744923/genuin/instream"}`,
 }

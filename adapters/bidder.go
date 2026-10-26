@@ -122,6 +122,11 @@ type RequestData struct {
 	Body    []byte
 	Headers http.Header
 	ImpIDs  []string
+
+	// NoRequest marks a request that must not be sent over the network. The exchange skips the
+	// HTTP round trip and hands MakeBids a synthetic response (StatusCode 200, empty Body, empty
+	// Headers) instead. Uri and ImpIDs are still recorded for debug output and seat non-bids.
+	NoRequest bool
 }
 
 // ExtImpBidder can be used by Bidders to unmarshal any request.imp[i].ext.

@@ -1,0 +1,26 @@
+# gam: Google Ad Manager as a demand source inside the auction (docs/adr/0002). An alias of
+# genuinhb with the gam-wrapper source type: PBS makes no network call; each video imp whose
+# stored imp carries gam params ({adUnitPath, cpm, custParams?, descriptionUrl?}) gets a VAST
+# wrapper bid whose VASTAdTagURI is a GAM tag built from those params and the request, priced
+# at the provider's cpm. The device's player resolves the wrapper, so GAM sees the real device.
+# The endpoint is the GAM tag base; the adapter appends every parameter itself.
+aliasOf: genuinhb
+endpoint: "https://pubads.g.doubleclick.net/gampad/ads"
+# sizes: extra GAM master slot sizes offered after the imp's own size (sz=320x480|640x480|400x300), so line
+# items trafficked at the standard video sizes fill vertical or small players; per-placement "sizes" params win.
+extra_info: '{"type": "gam-wrapper", "sizes": ["640x480", "400x300"]}'
+maintainer:
+  email: "nayan@begenuin.com"
+geoscope:
+  - global
+# Genuin owns the wrapper, so PBS may inject its /event impression tracker into it.
+modifyingVastXmlAllowed: true
+openrtb:
+  version: 2.6
+capabilities:
+  app:
+    mediaTypes:
+      - video
+  site:
+    mediaTypes:
+      - video

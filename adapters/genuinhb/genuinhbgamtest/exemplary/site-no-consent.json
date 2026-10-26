@@ -1,0 +1,63 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "site": {
+      "page": "https://www.begenuin.com/watch/demo",
+      "publisher": {
+        "id": "1001"
+      }
+    },
+    "imp": [
+      {
+        "id": "outstream-1",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 360,
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "adUnitPath": "/21775744923/genuin/instream",
+            "cpm": 0.5
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://pubads.g.doubleclick.net/gampad/ads?correlator=123456&description_url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&env=vp&gdfp_req=1&impl=s&iu=%2F21775744923%2Fgenuin%2Finstream&output=xml_vast4&sz=640x360&unviewed_position_start=1&url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&vpos=preroll",
+        "impIDs": [
+          "outstream-1"
+        ]
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "gam-outstream-1",
+            "impid": "outstream-1",
+            "price": 0.5,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"gam-outstream-1\"><Wrapper><AdSystem>GenuinHB</AdSystem><VASTAdTagURI><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?correlator=123456&description_url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&env=vp&gdfp_req=1&impl=s&iu=%2F21775744923%2Fgenuin%2Finstream&output=xml_vast4&sz=640x360&unviewed_position_start=1&url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&vpos=preroll]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "gam:/21775744923/genuin/instream",
+            "w": 640,
+            "h": 360,
+            "mtype": 2
+          },
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}
