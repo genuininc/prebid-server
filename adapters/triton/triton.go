@@ -45,6 +45,18 @@ const (
 // tagIDPattern mirrors the params schema: a tag id can never alter the RTB path.
 var tagIDPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
 
+// tritonFeedTypes are the feed-type values Triton documents.
+var tritonFeedTypes = map[string]bool{"podcast": true, "music": true, "radio": true, "game": true, "pureplay": true, "replay": true, "txt2speech": true}
+
+// requireTag is the tag check for the paths that call dsp-service (RTB and VAST), where the ad tag is
+// the path segment.
+func requireTag(index int, params *openrtb_ext.ExtImpTriton) error {
+	if params.TagID == "" {
+		return &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: tagId is required (imp.ext.data.tagId from the SDK, the stored imp's triton.tagId, or the tag in its adRequestUrl)", index)}
+	}
+	return nil
+}
+
 type adapter struct {
 	endpointTemplate *template.Template
 	// vastTemplate is dsp-service's VAST endpoint (the wrapper path), same macros as the RTB one.
@@ -149,8 +161,10 @@ func parseExtraInfo(raw string) (extraInfo, error) {
 	return info, nil
 }
 
-// MakeRequests routes every impression by media type: banner only → one RTB request to dsp-service;
-// audio or video → a Triton wrapper bid (no network call). Invalid impressions are reported and skipped.
+// MakeRequests routes every impression by media type and the placement's format switches: video or
+// audio (when enabled) → a Triton wrapper bid (no network call); banner (when enabled) → one RTB
+// request to dsp-service. A disabled bidder or a disabled format is skipped silently; an impression
+// with no supported media type is reported.
 func (a *adapter) MakeRequests(request *openrtb2.BidRequest, _ *adapters.ExtraRequestInfo) ([]*adapters.RequestData, []error) {
 	requests := make([]*adapters.RequestData, 0, len(request.Imp))
 	var errs []error
@@ -162,15 +176,24 @@ func (a *adapter) MakeRequests(request *openrtb2.BidRequest, _ *adapters.ExtraRe
 			errs = append(errs, err)
 			continue
 		}
+		if params.Enabled != nil && !*params.Enabled {
+			errs = append(errs, skipped(i, "the bidder is switched off for this placement (enabled: false)"))
+			continue
+		}
+		if imp.Audio == nil && imp.Video == nil && imp.Banner == nil {
+			errs = append(errs, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: triton supports only banner, video and audio impressions", i)})
+			continue
+		}
 
 		var rd *adapters.RequestData
-		switch {
-		case imp.Audio != nil || imp.Video != nil:
+		switch route(params, imp) {
+		case routeVideo, routeAudio:
 			rd, err = a.wrapperRequest(i, imp, params, request)
-		case imp.Banner != nil:
+		case routeBanner:
 			rd, err = a.rtbRequest(i, imp, params, request)
 		default:
-			err = &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: triton supports only banner, video and audio impressions", i)}
+			errs = append(errs, skipped(i, fmt.Sprintf("%s is switched off for this placement (formats)", mediaTypes(imp))))
+			continue
 		}
 		if err != nil {
 			errs = append(errs, err)
@@ -179,6 +202,68 @@ func (a *adapter) MakeRequests(request *openrtb2.BidRequest, _ *adapters.ExtraRe
 		requests = append(requests, rd)
 	}
 	return requests, errs
+}
+
+// skipped is the warning for an impression the placement's switches exclude. A warning, not an
+// error: nothing is wrong, and the exchange reports an adapter that returns neither requests nor
+// errors as a failure.
+func skipped(index int, why string) error {
+	return &errortypes.Warning{WarningCode: errortypes.UnknownWarningCode, Message: fmt.Sprintf("imp[%d]: triton skipped: %s", index, why)}
+}
+
+// mediaTypes names the media types an impression carries, for messages.
+func mediaTypes(imp *openrtb2.Imp) string {
+	var names []string
+	if imp.Video != nil {
+		names = append(names, "video")
+	}
+	if imp.Audio != nil {
+		names = append(names, "audio")
+	}
+	if imp.Banner != nil {
+		names = append(names, "banner")
+	}
+	return strings.Join(names, "+")
+}
+
+// impRoute is the path an impression takes: which media type the bidder serves it as.
+type impRoute int
+
+const (
+	routeNone   impRoute = iota
+	routeVideo           // Triton wrapper bid typed video
+	routeAudio           // Triton wrapper bid typed audio
+	routeBanner          // dsp-service RTB request
+)
+
+// route picks the first enabled media type of the impression, video before audio before banner.
+func route(p *openrtb_ext.ExtImpTriton, imp *openrtb2.Imp) impRoute {
+	switch {
+	case imp.Video != nil && formatEnabled(p, "video"):
+		return routeVideo
+	case imp.Audio != nil && formatEnabled(p, "audio"):
+		return routeAudio
+	case imp.Banner != nil && formatEnabled(p, "banner"):
+		return routeBanner
+	}
+	return routeNone
+}
+
+// formatEnabled reads the placement's format switch; a missing switch means enabled.
+func formatEnabled(p *openrtb_ext.ExtImpTriton, format string) bool {
+	if p.Formats == nil {
+		return true
+	}
+	var v *bool
+	switch format {
+	case "video":
+		v = p.Formats.Video
+	case "audio":
+		v = p.Formats.Audio
+	case "banner":
+		v = p.Formats.Banner
+	}
+	return v == nil || *v
 }
 
 // parseParams decodes imp.ext.bidder and applies the checks the schema cannot express per path.
@@ -194,11 +279,31 @@ func parseParams(index int, imp *openrtb2.Imp) (*openrtb_ext.ExtImpTriton, error
 	if params.STID < 1 {
 		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: stid must be a positive integer", index)}
 	}
-	if !tagIDPattern.MatchString(params.TagID) {
-		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: tagId is required and must match %s", index, tagIDPattern.String())}
+	// Brand and tag, most specific source first: the SDK's imp.ext.data.tagId, the explicit params, the
+	// path of the provider's adRequestUrl (dsp-service renders …/rtb/{brand}/{tag}), the publisher id.
+	// The tag is checked by the paths that need it (dsp-service RTB and VAST), not here.
+	urlBrand, urlTag := idsFromAdRequestURL(params.AdRequestURL)
+	if tagID := tagIDFromExt(imp.Ext); tagID != "" {
+		params.TagID = tagID
+	} else if params.TagID == "" {
+		params.TagID = urlTag
+	}
+	if params.BrandID == "" {
+		params.BrandID = urlBrand
+	}
+	if params.TagID != "" && !tagIDPattern.MatchString(params.TagID) {
+		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: tagId must match %s", index, tagIDPattern.String())}
 	}
 	if params.BrandID != "" && !tagIDPattern.MatchString(params.BrandID) {
 		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: brandId must match %s", index, tagIDPattern.String())}
+	}
+	if params.BaseURL != "" {
+		if u, err := url.Parse(params.BaseURL); err != nil || u.Scheme != "https" || u.Host == "" || u.Fragment != "" {
+			return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: baseUrl must be an absolute https URL", index)}
+		}
+	}
+	if params.FeedType != "" && !tritonFeedTypes[params.FeedType] {
+		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: feedType must be one of podcast, music, radio, game, pureplay, replay, txt2speech", index)}
 	}
 	switch params.RenderMode {
 	case "":
@@ -228,6 +333,9 @@ type cxr struct {
 // rtbRequest builds the single-impression OpenRTB request for dsp-service: the incoming request
 // narrowed to this impression, bidder params stripped from imp.ext, ext replaced by cxr.
 func (a *adapter) rtbRequest(index int, imp *openrtb2.Imp, params *openrtb_ext.ExtImpTriton, request *openrtb2.BidRequest) (*adapters.RequestData, error) {
+	if err := requireTag(index, params); err != nil {
+		return nil, err
+	}
 	brand := resolveBrand(params, request)
 	if brand == "" {
 		return nil, &errortypes.BadInput{Message: fmt.Sprintf("imp[%d]: app.publisher.id or site.publisher.id (the brand) is required", index)}
@@ -289,6 +397,48 @@ func resolveBrand(params *openrtb_ext.ExtImpTriton, request *openrtb2.BidRequest
 	return brandID(request)
 }
 
+// tagIDFromExt reads the Ad tag the SDK sends in imp.ext.data.tagId: a string, or the first element
+// of a string array (Prebid Mobile's addExtData writes arrays). "" when absent or of another type.
+func tagIDFromExt(ext json.RawMessage) string {
+	value, dataType, _, err := jsonparser.Get(ext, "data", "tagId")
+	if err != nil {
+		return ""
+	}
+	switch dataType {
+	case jsonparser.String:
+		return string(value)
+	case jsonparser.Array:
+		var first string
+		_, _ = jsonparser.ArrayEach(value, func(item []byte, itemType jsonparser.ValueType, _ int, _ error) {
+			if first == "" && itemType == jsonparser.String {
+				first = string(item)
+			}
+		})
+		return first
+	}
+	return ""
+}
+
+// idsFromAdRequestURL reads the brand and tag from a dsp-service URL of the form
+// …/rtb/{brand}/{tag} or …/vast/{brand}/{tag}; both "" when the URL has no such path. Only the path
+// is read: the host never redirects a request (endpoints are host config).
+func idsFromAdRequestURL(raw string) (brand, tag string) {
+	if raw == "" {
+		return "", ""
+	}
+	u, err := url.Parse(raw)
+	if err != nil {
+		return "", ""
+	}
+	segments := strings.Split(strings.Trim(u.Path, "/"), "/")
+	for i := 0; i+2 < len(segments); i++ {
+		if (segments[i] == "rtb" || segments[i] == "vast") && tagIDPattern.MatchString(segments[i+1]) && tagIDPattern.MatchString(segments[i+2]) {
+			return segments[i+1], segments[i+2]
+		}
+	}
+	return "", ""
+}
+
 // bannerWithSize gives the outgoing banner explicit w/h from its first format when the SDK sent only
 // format[]: dsp-service's RTB handler reads banner.w/h alone and otherwise sizes the creative 300x600.
 // The incoming request is never touched (a copy is returned when anything changes).
@@ -340,11 +490,15 @@ func placementID(ext json.RawMessage) string {
 // 200 → the OpenRTB bids with their type from mtype and the price macro resolved.
 func (a *adapter) MakeBids(request *openrtb2.BidRequest, requestData *adapters.RequestData, responseData *adapters.ResponseData) (*adapters.BidderResponse, []error) {
 	if requestData.NoRequest {
-		_, imp, err := findImp(request, requestData)
+		index, imp, err := findImp(request, requestData)
 		if err != nil {
 			return nil, []error{err}
 		}
-		return wrapperBid(imp, requestData)
+		params, err := parseParams(index, imp)
+		if err != nil {
+			return nil, []error{err}
+		}
+		return wrapperBid(imp, params, requestData)
 	}
 	if adapters.IsResponseStatusCodeNoContent(responseData) {
 		return nil, nil

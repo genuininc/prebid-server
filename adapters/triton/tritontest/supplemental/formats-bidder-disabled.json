@@ -1,0 +1,59 @@
+{
+  "mockBidRequest": {
+    "id": "fd",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "1842"
+      }
+    },
+    "imp": [
+      {
+        "id": "a",
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6aa25b631b3a25f3c479ef7c",
+            "brandId": "3252",
+            "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars",
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "b",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6aa25b631b3a25f3c479ef7c",
+            "brandId": "3252",
+            "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars",
+            "enabled": false
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: triton skipped: the bidder is switched off for this placement (enabled: false)",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[1]: triton skipped: the bidder is switched off for this placement (enabled: false)",
+      "comparison": "literal"
+    }
+  ]
+}

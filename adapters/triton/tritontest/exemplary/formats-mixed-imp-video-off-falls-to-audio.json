@@ -1,0 +1,77 @@
+{
+  "mockBidRequest": {
+    "id": "fm",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "1842"
+      }
+    },
+    "imp": [
+      {
+        "id": "m",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480,
+          "startdelay": 0
+        },
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0
+        },
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6aa25b631b3a25f3c479ef7c",
+            "brandId": "3252",
+            "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars",
+            "formats": {
+              "video": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://cmod-na.live.streamtheworld.com/ondemand/ars?bundle-id=com.begenuin.demo&dist=com.begenuin.demo&maxAds=1&stid=1443132&store-id=com.begenuin.demo&ttag=brand_id%3A3252&type=preroll",
+        "impIDs": [
+          "m"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-m",
+            "impid": "m",
+            "price": 0.05,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-m\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://cmod-na.live.streamtheworld.com/ondemand/ars?bundle-id=com.begenuin.demo&dist=com.begenuin.demo&maxAds=1&stid=1443132&store-id=com.begenuin.demo&ttag=brand_id%3A3252&type=preroll]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "triton:1443132",
+            "mtype": 3
+          },
+          "type": "audio"
+        }
+      ]
+    }
+  ]
+}

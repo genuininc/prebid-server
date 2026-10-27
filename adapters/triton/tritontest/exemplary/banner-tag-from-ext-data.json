@@ -1,0 +1,79 @@
+{
+  "mockBidRequest": {
+    "id": "req-extdata",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "1842"
+      }
+    },
+    "imp": [
+      {
+        "id": "banner-1",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "data": {
+            "placementId": "pl-1",
+            "tagId": "6aa25b631b3a25f3c479ef7c"
+          },
+          "bidder": {
+            "stid": 1443132,
+            "brandId": "3252",
+            "tagId": "stored-default"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3252/6aa25b631b3a25f3c479ef7c",
+        "body": {
+          "id": "req-extdata",
+          "app": {
+            "bundle": "com.begenuin.demo",
+            "publisher": {
+              "id": "1842"
+            }
+          },
+          "imp": [
+            {
+              "id": "banner-1",
+              "banner": {
+                "w": 300,
+                "h": 250
+              },
+              "ext": {
+                "data": {
+                  "placementId": "pl-1",
+                  "tagId": "6aa25b631b3a25f3c479ef7c"
+                }
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 0,
+              "stid": 1443132,
+              "host_render": "server",
+              "brand_id": "3252",
+              "tag_id": "6aa25b631b3a25f3c479ef7c",
+              "placement_id": "pl-1"
+            }
+          }
+        },
+        "impIDs": [
+          "banner-1"
+        ]
+      },
+      "mockResponse": {
+        "status": 204
+      }
+    }
+  ],
+  "expectedBidResponses": []
+}

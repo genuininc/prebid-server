@@ -1,0 +1,35 @@
+{
+  "mockBidRequest": {
+    "id": "notag",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "1842"
+      }
+    },
+    "imp": [
+      {
+        "id": "a",
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: tagId is required (imp.ext.data.tagId from the SDK, the stored imp's triton.tagId, or the tag in its adRequestUrl)",
+      "comparison": "literal"
+    }
+  ]
+}

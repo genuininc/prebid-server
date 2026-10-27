@@ -170,11 +170,11 @@
       "comparison": "literal"
     },
     {
-      "value": "imp[1]: tagId is required and must match ^[A-Za-z0-9_-]{1,64}$",
+      "value": "imp[1]: tagId is required (imp.ext.data.tagId from the SDK, the stored imp's triton.tagId, or the tag in its adRequestUrl)",
       "comparison": "literal"
     },
     {
-      "value": "imp[2]: tagId is required and must match ^[A-Za-z0-9_-]{1,64}$",
+      "value": "imp[2]: tagId must match ^[A-Za-z0-9_-]{1,64}$",
       "comparison": "literal"
     },
     {

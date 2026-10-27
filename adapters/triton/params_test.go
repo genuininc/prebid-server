@@ -38,6 +38,8 @@ func TestInvalidParams(t *testing.T) {
 }
 
 var validParams = []string{
+	`{"stid": 1443132}`, // tagId may come from imp.ext.data.tagId; the bidder checks it
+	`{"stid": 1443132, "adRequestUrl": "https://aapi.begenuin.com/goservices/dsp/rtb/3252/6aa25b631b3a25f3c479ef7c"}`,
 	`{"stid": 1443132, "tagId": "6a3aa78ba0daccfd439648b8"}`,
 	`{"stid": 1, "tagId": "a"}`,
 	`{"stid": 1443132, "tagId": "6aa25b631b3a25f3c479ef7c", "brandId": "3252"}`,
@@ -46,6 +48,10 @@ var validParams = []string{
 	`{"stid": 1443132, "tagId": "abc", "cpm": 0.05}`,
 	`{"stid": 1443132, "tagId": "` + strings.Repeat("9", 64) + `"}`,
 	`{"stid": 1443132, "tagId": "abc", "unknown": true}`,
+	`{"stid": 1443132, "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars"}`,
+	`{"stid": 1443132, "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars", "feedType": "podcast", "formats": {"audio": true, "video": false, "banner": true}}`,
+	`{"stid": 1443132, "enabled": false}`,
+	`{"stid": 1443132, "formats": {}}`,
 }
 
 var invalidParams = []string{
@@ -53,7 +59,6 @@ var invalidParams = []string{
 	`null`,
 	`{}`,
 	`[]`,
-	`{"stid": 1443132}`,
 	`{"tagId": "abc"}`,
 	`{"stid": "1443132", "tagId": "abc"}`,
 	`{"stid": 0, "tagId": "abc"}`,
@@ -70,6 +75,12 @@ var invalidParams = []string{
 	`{"stid": 1443132, "tagId": "abc", "cpm": 0}`,
 	`{"stid": 1443132, "tagId": "abc", "cpm": -1}`,
 	`{"stid": 1443132, "tagId": "abc", "cpm": "1"}`,
+	`{"stid": 1443132, "baseUrl": "http://cmod-na.live.streamtheworld.com/ondemand/ars"}`,
+	`{"stid": 1443132, "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars?x=1"}`,
+	`{"stid": 1443132, "feedType": "video"}`,
+	`{"stid": 1443132, "enabled": "yes"}`,
+	`{"stid": 1443132, "formats": {"audio": "on"}}`,
+	`{"stid": 1443132, "formats": {"native": true}}`,
 	`{"stid": 1443132, "tagId": "abc", "brandId": ""}`,
 	`{"stid": 1443132, "tagId": "abc", "brandId": "32/52"}`,
 	`{"stid": 1443132, "tagId": "abc", "brandId": 3252}`,

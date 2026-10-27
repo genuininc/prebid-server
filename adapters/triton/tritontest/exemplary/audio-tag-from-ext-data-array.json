@@ -1,0 +1,64 @@
+{
+  "mockBidRequest": {
+    "id": "req-extdata-audio",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "imp": [
+      {
+        "id": "audio-1",
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0
+        },
+        "ext": {
+          "data": {
+            "tagId": [
+              "6aa25b631b3a25f3c479ef7c"
+            ]
+          },
+          "bidder": {
+            "stid": 1443132
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/vast/3250/6aa25b631b3a25f3c479ef7c?ad_type=preroll&bundle=com.begenuin.demo&imp_id=audio-1&req_id=req-extdata-audio&startdelay_iv=0",
+        "impIDs": [
+          "audio-1"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-audio-1",
+            "impid": "audio-1",
+            "price": 0.05,
+            "crid": "triton:1443132",
+            "mtype": 3,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-audio-1\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://dsp.example.test/goservices/dsp/vast/3250/6aa25b631b3a25f3c479ef7c?ad_type=preroll&bundle=com.begenuin.demo&imp_id=audio-1&req_id=req-extdata-audio&startdelay_iv=0]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>"
+          },
+          "type": "audio"
+        }
+      ]
+    }
+  ]
+}

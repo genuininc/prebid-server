@@ -1,0 +1,102 @@
+{
+  "mockBidRequest": {
+    "id": "fmb",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "1842"
+      }
+    },
+    "imp": [
+      {
+        "id": "m",
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480,
+          "startdelay": 0
+        },
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0
+        },
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6aa25b631b3a25f3c479ef7c",
+            "brandId": "3252",
+            "baseUrl": "https://cmod-na.live.streamtheworld.com/ondemand/ars",
+            "formats": {
+              "video": false,
+              "audio": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3252/6aa25b631b3a25f3c479ef7c",
+        "body": {
+          "id": "fmb",
+          "app": {
+            "bundle": "com.begenuin.demo",
+            "publisher": {
+              "id": "1842"
+            }
+          },
+          "imp": [
+            {
+              "id": "m",
+              "video": {
+                "mimes": [
+                  "video/mp4"
+                ],
+                "w": 640,
+                "h": 480,
+                "startdelay": 0
+              },
+              "audio": {
+                "mimes": [
+                  "audio/mpeg"
+                ],
+                "startdelay": 0
+              },
+              "banner": {
+                "w": 300,
+                "h": 250
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 0,
+              "stid": 1443132,
+              "host_render": "server",
+              "brand_id": "3252",
+              "tag_id": "6aa25b631b3a25f3c479ef7c",
+              "placement_id": ""
+            }
+          }
+        },
+        "impIDs": [
+          "m"
+        ]
+      },
+      "mockResponse": {
+        "status": 204
+      }
+    }
+  ],
+  "expectedBidResponses": []
+}

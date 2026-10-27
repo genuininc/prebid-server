@@ -44,7 +44,7 @@ func appRequest() *openrtb2.BidRequest {
 // query builds the VAST URL and returns its decoded query, so tests assert parameters, not encoding.
 func query(t *testing.T, p *openrtb_ext.ExtImpTriton, imp *openrtb2.Imp, req *openrtb2.BidRequest) url.Values {
 	t.Helper()
-	adRequestURL, err := testAdapter(t).buildAdRequestURL(p, imp, req)
+	adRequestURL, err := testAdapter(t).buildDSPVASTURL(p, imp, req)
 	require.NoError(t, err)
 	u, err := url.Parse(adRequestURL)
 	require.NoError(t, err)
@@ -62,13 +62,13 @@ func TestAdRequestURLIdentity(t *testing.T) {
 	t.Run("brandId param wins over the publisher id in the path", func(t *testing.T) {
 		p := baseParams()
 		p.BrandID = "3252"
-		adRequestURL, err := testAdapter(t).buildAdRequestURL(p, audioImp(nil), appRequest())
+		adRequestURL, err := testAdapter(t).buildDSPVASTURL(p, audioImp(nil), appRequest())
 		require.NoError(t, err)
 		assert.True(t, strings.HasPrefix(adRequestURL, "https://dsp.example.test/goservices/dsp/vast/3252/6a3aa78ba0daccfd439648b8?"), adRequestURL)
 	})
 
 	t.Run("no brand anywhere: no URL", func(t *testing.T) {
-		_, err := testAdapter(t).buildAdRequestURL(baseParams(), audioImp(nil), &openrtb2.BidRequest{ID: "r", App: &openrtb2.App{}})
+		_, err := testAdapter(t).buildDSPVASTURL(baseParams(), audioImp(nil), &openrtb2.BidRequest{ID: "r", App: &openrtb2.App{}})
 		require.Error(t, err)
 	})
 
@@ -229,7 +229,7 @@ func keysOf(q url.Values) []string {
 func TestAdRequestURLLength(t *testing.T) {
 	req := appRequest()
 	req.App.Name = strings.Repeat("k", 4100)
-	_, err := testAdapter(t).buildAdRequestURL(baseParams(), audioImp(nil), req)
+	_, err := testAdapter(t).buildDSPVASTURL(baseParams(), audioImp(nil), req)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "4000")
 }
@@ -244,7 +244,7 @@ func TestVASTEndpointConfig(t *testing.T) {
 		bidder, err := Builder(openrtb_ext.BidderTriton, config.Adapter{Endpoint: testEndpoint,
 			ExtraAdapterInfo: `{"vast_endpoint": "https://vast.example.test/v/{{.AccountID}}/{{.AdUnit}}?src=pbs"}`}, testServer)
 		require.NoError(t, err)
-		adRequestURL, err := bidder.(*adapter).buildAdRequestURL(baseParams(), audioImp(nil), appRequest())
+		adRequestURL, err := bidder.(*adapter).buildDSPVASTURL(baseParams(), audioImp(nil), appRequest())
 		require.NoError(t, err)
 		assert.True(t, strings.HasPrefix(adRequestURL, "https://vast.example.test/v/3250/6a3aa78ba0daccfd439648b8?src=pbs&"), adRequestURL)
 	})
@@ -279,7 +279,7 @@ func TestWrapperBidMixedMedia(t *testing.T) {
 		Audio: &openrtb2.Audio{StartDelay: ptrutil.ToPtr(adcom1.StartPostRoll)},
 		Video: &openrtb2.Video{StartDelay: ptrutil.ToPtr(adcom1.StartPreRoll), W: ptrutil.ToPtr[int64](640), H: ptrutil.ToPtr[int64](480)},
 		Ext:   json.RawMessage(`{"bidder":{"stid":1443132,"tagId":"t","cpm":0.75}}`)}
-	bids, errs := wrapperBid(imp, &adapters.RequestData{Uri: vastBase + "?req_id=r", NoRequest: true})
+	bids, errs := wrapperBid(imp, &openrtb_ext.ExtImpTriton{STID: 1443132, TagID: "t", CPM: 0.75}, &adapters.RequestData{Uri: vastBase + "?req_id=r", NoRequest: true})
 	require.Empty(t, errs)
 	require.Len(t, bids.Bids, 1)
 	assert.Equal(t, openrtb_ext.BidTypeVideo, bids.Bids[0].BidType)

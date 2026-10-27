@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Triton Bidder Params",
-  "description": "A schema which validates params accepted by the Triton bidder: the Triton station and dsp-service ad tag of a placement, plus the per-placement settings of the two paths (banner via dsp-service RTB, audio/video via a VAST wrapper to dsp-service's VAST endpoint).",
+  "description": "A schema which validates params accepted by the Triton bidder: the Triton station and dsp-service ad tag of a placement, the per-format switches, and the settings of the two paths (banner via dsp-service RTB; audio/video via a VAST wrapper to Triton's on-demand request when baseUrl is set, else to dsp-service's VAST endpoint).",
   "type": "object",
   "properties": {
     "stid": {
@@ -11,7 +11,7 @@
     },
     "tagId": {
       "type": "string",
-      "description": "dsp-service ad tag id of the placement, used as the {tag} path segment of the RTB endpoint",
+      "description": "dsp-service ad tag id of the placement, the {tag} path segment of the RTB and VAST endpoints. Usually sent by the SDK as imp.ext.data.tagId, which overrides this value; required one way or the other (the bidder reports the impression otherwise)",
       "minLength": 1,
       "maxLength": 64,
       "pattern": "^[A-Za-z0-9_-]+$"
@@ -22,6 +22,11 @@
       "minLength": 1,
       "maxLength": 64,
       "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "adRequestUrl": {
+      "type": "string",
+      "description": "the dsp-service RTB URL the provider record names (https://\u2026/goservices/dsp/rtb/{brand}/{tag}); only its brand and tag path segments are read, as defaults for brandId and tagId. The host is ignored: endpoints are Prebid Server config",
+      "maxLength": 512
     },
     "hostRender": {
       "type": "string",
@@ -36,10 +41,51 @@
       "description": "audio/video: the price the Triton wrapper bid competes at (CPM, USD); defaults to 0.05",
       "minimum": 0,
       "exclusiveMinimum": true
+    },
+    "baseUrl": {
+      "type": "string",
+      "description": "audio/video: Triton's on-demand ad request base, e.g. https://cmod-na.live.streamtheworld.com/ondemand/ars (absolute https). When set, audio and video wrapper bids point at Triton directly with the documented request parameters; when absent they point at dsp-service's VAST endpoint for the ad tag",
+      "pattern": "^https://[^\\s?#]+$",
+      "maxLength": 512
+    },
+    "feedType": {
+      "type": "string",
+      "description": "audio/video with baseUrl: Triton feed-type of the inventory",
+      "enum": [
+        "podcast",
+        "music",
+        "radio",
+        "game",
+        "pureplay",
+        "replay",
+        "txt2speech"
+      ]
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "false turns the bidder off for the placement (no request, no bid); absent = enabled"
+    },
+    "formats": {
+      "type": "object",
+      "description": "per-format switches; an absent object or field means enabled",
+      "properties": {
+        "audio": {
+          "type": "boolean",
+          "description": "Triton wrapper bids for audio impressions"
+        },
+        "video": {
+          "type": "boolean",
+          "description": "Triton wrapper bids for video impressions"
+        },
+        "banner": {
+          "type": "boolean",
+          "description": "dsp-service RTB requests for banner impressions"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
-    "stid",
-    "tagId"
+    "stid"
   ]
 }

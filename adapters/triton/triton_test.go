@@ -99,3 +99,37 @@ func TestBidTypeFor(t *testing.T) {
 		})
 	}
 }
+
+func TestTagIDFromExt(t *testing.T) {
+	tests := map[string]string{
+		`{"data":{"tagId":"6aa25b631b3a25f3c479ef7c"}}`:           "6aa25b631b3a25f3c479ef7c",
+		`{"data":{"tagId":["6aa25b631b3a25f3c479ef7c","other"]}}`: "6aa25b631b3a25f3c479ef7c",
+		`{"data":{"tagId":[1, "second"]}}`:                        "second",
+		`{"data":{"tagId":[]}}`:                                   "",
+		`{"data":{"tagId":42}}`:                                   "",
+		`{"data":{"placementId":"pl"}}`:                           "",
+		`{"bidder":{"tagId":"stored"}}`:                           "",
+		``:                                                        "",
+	}
+	for ext, want := range tests {
+		require.Equal(t, want, tagIDFromExt([]byte(ext)), ext)
+	}
+}
+
+func TestIDsFromAdRequestURL(t *testing.T) {
+	tests := map[string][2]string{
+		"https://aapi.begenuin.com/goservices/dsp/rtb/3252/6aa25b631b3a25f3c479ef7c":      {"3252", "6aa25b631b3a25f3c479ef7c"},
+		"https://aapi.begenuin.com/goservices/dsp/vast/3252/6aa25b631b3a25f3c479ef7c?x=1": {"3252", "6aa25b631b3a25f3c479ef7c"},
+		"http://localhost:9096/dsp/rtb/1842/tag-1/":                                       {"1842", "tag-1"},
+		"https://od-spy.live.streamtheworld.com/ondemand/ars":                             {"", ""},
+		"https://aapi.begenuin.com/goservices/dsp/rtb/3252":                               {"", ""},
+		"https://aapi.begenuin.com/goservices/dsp/rtb/32/52/6aa25b631b3a25f3c479ef7c":     {"32", "52"},
+		"":       {"", ""},
+		"://bad": {"", ""},
+	}
+	for raw, want := range tests {
+		brand, tag := idsFromAdRequestURL(raw)
+		require.Equal(t, want[0], brand, raw)
+		require.Equal(t, want[1], tag, raw)
+	}
+}
