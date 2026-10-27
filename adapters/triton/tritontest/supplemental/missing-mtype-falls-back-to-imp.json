@@ -1,0 +1,45 @@
+{
+  "mockBidRequest": {
+    "id": "req-fallback",
+    "app": {"publisher": {"id": "3250"}},
+    "imp": [{"id": "banner-1", "banner": {"w": 300, "h": 250}, "ext": {"bidder": {"stid": 1443132, "tagId": "t"}}}]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/t",
+        "body": {
+          "id": "req-fallback",
+          "app": {"publisher": {"id": "3250"}},
+          "imp": [{"id": "banner-1", "banner": {"w": 300, "h": 250}}],
+          "ext": {"cxr": {"pa": 0, "stid": 1443132, "host_render": "server", "brand_id": "3250", "tag_id": "t", "placement_id": ""}}
+        },
+        "impIDs": ["banner-1"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": {
+          "id": "req-fallback",
+          "cur": "EUR",
+          "seatbid": [{"seat": "tgen", "bid": [
+            {"id": "b-1", "impid": "banner-1", "price": 0.5, "adm": "<div/>"},
+            {"id": "b-2", "impid": "banner-1", "price": 0.5, "adm": "<div/>", "mtype": 4},
+            {"id": "b-3", "impid": "unknown", "price": 0.5, "adm": "<div/>"}
+          ]}]
+        }
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "EUR",
+      "bids": [
+        {"bid": {"id": "b-1", "impid": "banner-1", "price": 0.5, "adm": "<div/>"}, "type": "banner"}
+      ]
+    }
+  ],
+  "expectedMakeBidsErrors": [
+    {"value": "triton: bid \"b-2\" has unsupported mtype 4", "comparison": "literal"},
+    {"value": "triton: bid \"b-3\" refers to unknown imp \"unknown\"", "comparison": "literal"}
+  ]
+}

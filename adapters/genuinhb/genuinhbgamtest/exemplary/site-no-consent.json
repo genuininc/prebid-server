@@ -33,7 +33,8 @@
         "uri": "https://pubads.g.doubleclick.net/gampad/ads?correlator=123456&description_url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&env=vp&gdfp_req=1&impl=s&iu=%2F21775744923%2Fgenuin%2Finstream&output=xml_vast4&sz=640x360&unviewed_position_start=1&url=https%3A%2F%2Fwww.begenuin.com%2Fwatch%2Fdemo&vpos=preroll",
         "impIDs": [
           "outstream-1"
-        ]
+        ],
+        "noRequest": true
       },
       "mockResponse": {
         "status": 200

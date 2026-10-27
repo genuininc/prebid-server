@@ -1,0 +1,109 @@
+{
+  "mockBidRequest": {
+    "id": "req-site",
+    "site": {
+      "page": "https://www.begenuin.com/watch/demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "imp": [
+      {
+        "id": "banner-1",
+        "banner": {
+          "w": 300,
+          "h": 600
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6a3aa78ba0daccfd439648b8",
+            "hostRender": "client"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/6a3aa78ba0daccfd439648b8",
+        "body": {
+          "id": "req-site",
+          "site": {
+            "page": "https://www.begenuin.com/watch/demo",
+            "publisher": {
+              "id": "3250"
+            }
+          },
+          "imp": [
+            {
+              "id": "banner-1",
+              "banner": {
+                "w": 300,
+                "h": 600
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 1,
+              "stid": 1443132,
+              "host_render": "client",
+              "brand_id": "3250",
+              "tag_id": "6a3aa78ba0daccfd439648b8",
+              "placement_id": ""
+            }
+          }
+        },
+        "impIDs": ["banner-1"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": {
+          "id": "req-site",
+          "cur": "USD",
+          "seatbid": [
+            {
+              "seat": "tgen",
+              "bid": [
+                {
+                  "id": "req-site-1",
+                  "impid": "banner-1",
+                  "price": 1.05,
+                  "crid": "genuin-pa-300x600",
+                  "cid": "genuin-pa",
+                  "adomain": ["begenuin.com"],
+                  "w": 300,
+                  "h": 600,
+                  "adm": "<!doctype html><html><body>boot creative</body></html>"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "req-site-1",
+            "impid": "banner-1",
+            "price": 1.05,
+            "crid": "genuin-pa-300x600",
+            "cid": "genuin-pa",
+            "adomain": ["begenuin.com"],
+            "w": 300,
+            "h": 600,
+            "adm": "<!doctype html><html><body>boot creative</body></html>"
+          },
+          "type": "banner"
+        }
+      ]
+    }
+  ]
+}

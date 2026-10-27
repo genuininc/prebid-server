@@ -1,0 +1,92 @@
+{
+  "mockBidRequest": {
+    "id": "req-video",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "storeurl": "https://apps.apple.com/app/id000000000",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "device": {
+      "os": "Android",
+      "osv": "14",
+      "language": "en",
+      "ifa": "38400000-8cf0-11bd-b23e-10b96e40000d",
+      "lmt": 0
+    },
+    "imp": [
+      {
+        "id": "pre-1",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "video": {
+          "mimes": [
+            "video/mp4"
+          ],
+          "w": 640,
+          "h": 480,
+          "minduration": 5,
+          "maxduration": 30,
+          "startdelay": 0,
+          "delivery": [
+            2
+          ],
+          "companionad": [
+            {
+              "w": 300,
+              "h": 250
+            },
+            {
+              "w": 728,
+              "h": 90
+            }
+          ]
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1446814,
+            "tagId": "6a3aa78ba0daccfd439648b8",
+            "cpm": 0.75
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=preroll&bundle=com.begenuin.demo&device_language=en&did=38400000-8cf0-11bd-b23e-10b96e40000d&imp_id=pre-1&is_lat=0&os=android&osv=14&player_height=480&player_width=640&req_id=req-video&startdelay_iv=0&store_url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000",
+        "impIDs": [
+          "pre-1"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-pre-1",
+            "impid": "pre-1",
+            "price": 0.75,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-pre-1\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=preroll&bundle=com.begenuin.demo&device_language=en&did=38400000-8cf0-11bd-b23e-10b96e40000d&imp_id=pre-1&is_lat=0&os=android&osv=14&player_height=480&player_width=640&req_id=req-video&startdelay_iv=0&store_url=https%3A%2F%2Fapps.apple.com%2Fapp%2Fid000000000]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "triton:1446814",
+            "w": 640,
+            "h": 480,
+            "mtype": 2
+          },
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}

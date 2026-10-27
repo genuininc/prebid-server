@@ -1,0 +1,171 @@
+{
+  "mockBidRequest": {
+    "id": "req-two",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "imp": [
+      {
+        "id": "banner-a",
+        "banner": {
+          "w": 320,
+          "h": 50
+        },
+        "ext": {
+          "data": {
+            "placementId": "pl-a"
+          },
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "tag-a"
+          }
+        }
+      },
+      {
+        "id": "banner-b",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "data": {
+            "placementId": "pl-b"
+          },
+          "bidder": {
+            "stid": 1446814,
+            "tagId": "tag-b",
+            "hostRender": "client"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/tag-a",
+        "body": {
+          "id": "req-two",
+          "app": {
+            "bundle": "com.begenuin.demo",
+            "publisher": {
+              "id": "3250"
+            }
+          },
+          "imp": [
+            {
+              "id": "banner-a",
+              "banner": {
+                "w": 320,
+                "h": 50
+              },
+              "ext": {
+                "data": {
+                  "placementId": "pl-a"
+                }
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 0,
+              "stid": 1443132,
+              "host_render": "server",
+              "brand_id": "3250",
+              "tag_id": "tag-a",
+              "placement_id": "pl-a"
+            }
+          }
+        },
+        "impIDs": ["banner-a"]
+      },
+      "mockResponse": {
+        "status": 204
+      }
+    },
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/tag-b",
+        "body": {
+          "id": "req-two",
+          "app": {
+            "bundle": "com.begenuin.demo",
+            "publisher": {
+              "id": "3250"
+            }
+          },
+          "imp": [
+            {
+              "id": "banner-b",
+              "banner": {
+                "w": 300,
+                "h": 250
+              },
+              "ext": {
+                "data": {
+                  "placementId": "pl-b"
+                }
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 1,
+              "stid": 1446814,
+              "host_render": "client",
+              "brand_id": "3250",
+              "tag_id": "tag-b",
+              "placement_id": "pl-b"
+            }
+          }
+        },
+        "impIDs": ["banner-b"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": {
+          "id": "req-two",
+          "cur": "USD",
+          "seatbid": [
+            {
+              "seat": "tgen",
+              "bid": [
+                {
+                  "id": "req-two-1",
+                  "impid": "banner-b",
+                  "price": 2,
+                  "crid": "triton",
+                  "w": 300,
+                  "h": 250,
+                  "adm": "<div>ad</div>"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "req-two-1",
+            "impid": "banner-b",
+            "price": 2,
+            "crid": "triton",
+            "w": 300,
+            "h": 250,
+            "adm": "<div>ad</div>"
+          },
+          "type": "banner"
+        }
+      ]
+    }
+  ]
+}

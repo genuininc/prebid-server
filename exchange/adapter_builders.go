@@ -249,6 +249,7 @@ import (
 	"github.com/prebid/prebid-server/v4/adapters/trafficgate"
 	"github.com/prebid/prebid-server/v4/adapters/triplelift"
 	"github.com/prebid/prebid-server/v4/adapters/triplelift_native"
+	"github.com/prebid/prebid-server/v4/adapters/triton"
 	"github.com/prebid/prebid-server/v4/adapters/trustedstack"
 	"github.com/prebid/prebid-server/v4/adapters/trustx"
 	"github.com/prebid/prebid-server/v4/adapters/ucfunnel"
@@ -533,6 +534,7 @@ func newAdapterBuilders() map[openrtb_ext.BidderName]adapters.Builder {
 		openrtb_ext.BidderTrafficGate:       trafficgate.Builder,
 		openrtb_ext.BidderTriplelift:        triplelift.Builder,
 		openrtb_ext.BidderTripleliftNative:  triplelift_native.Builder,
+		openrtb_ext.BidderTriton:            triton.Builder,
 		openrtb_ext.BidderTrustedstack:      trustedstack.Builder,
 		openrtb_ext.BidderTrustX:            trustx.Builder,
 		openrtb_ext.BidderUcfunnel:          ucfunnel.Builder,

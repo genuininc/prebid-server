@@ -1,0 +1,64 @@
+{
+  "mockBidRequest": {
+    "id": "req-audio-site",
+    "site": {
+      "page": "https://www.begenuin.com/listen/demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "user": {
+      "id": "4fe8ac15-333e-4ce7-8e5c-febdd49ca0fb"
+    },
+    "imp": [
+      {
+        "id": "audio-2",
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": -1,
+          "maxseq": 3
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6a3aa78ba0daccfd439648b8"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=midroll&imp_id=audio-2&req_id=req-audio-site&site_page=https%3A%2F%2Fwww.begenuin.com%2Flisten%2Fdemo&startdelay_iv=-1&user_id=4fe8ac15-333e-4ce7-8e5c-febdd49ca0fb",
+        "impIDs": [
+          "audio-2"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-audio-2",
+            "impid": "audio-2",
+            "price": 0.05,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-audio-2\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=midroll&imp_id=audio-2&req_id=req-audio-site&site_page=https%3A%2F%2Fwww.begenuin.com%2Flisten%2Fdemo&startdelay_iv=-1&user_id=4fe8ac15-333e-4ce7-8e5c-febdd49ca0fb]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "triton:1443132",
+            "mtype": 3
+          },
+          "type": "audio"
+        }
+      ]
+    }
+  ]
+}

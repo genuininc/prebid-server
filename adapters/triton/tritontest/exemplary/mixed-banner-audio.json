@@ -1,0 +1,65 @@
+{
+  "mockBidRequest": {
+    "id": "req-mixed",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "imp": [
+      {
+        "id": "mixed-1",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": -2
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6a3aa78ba0daccfd439648b8",
+            "cpm": 0.3
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=postroll&bundle=com.begenuin.demo&imp_id=mixed-1&req_id=req-mixed&startdelay_iv=-2",
+        "impIDs": [
+          "mixed-1"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-mixed-1",
+            "impid": "mixed-1",
+            "price": 0.3,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-mixed-1\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_type=postroll&bundle=com.begenuin.demo&imp_id=mixed-1&req_id=req-mixed&startdelay_iv=-2]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "triton:1443132",
+            "mtype": 3
+          },
+          "type": "audio"
+        }
+      ]
+    }
+  ]
+}

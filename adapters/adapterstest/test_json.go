@@ -193,10 +193,11 @@ type httpCall struct {
 
 func (req *httpRequest) ToRequestData(t *testing.T) *adapters.RequestData {
 	return &adapters.RequestData{
-		Method: "POST",
-		Uri:    req.Uri,
-		Body:   req.Body,
-		ImpIDs: req.ImpIDs,
+		Method:    "POST",
+		Uri:       req.Uri,
+		Body:      req.Body,
+		ImpIDs:    req.ImpIDs,
+		NoRequest: req.NoRequest,
 	}
 }
 
@@ -205,6 +206,9 @@ type httpRequest struct {
 	Uri     string          `json:"uri"`
 	Headers http.Header     `json:"headers"`
 	ImpIDs  []string        `json:"impIDs"`
+	// NoRequest marks a request the exchange never sends (a bid built without a network call,
+	// docs/adr/0004); the harness hands MakeBids a synthetic 200 for it, as the exchange does.
+	NoRequest bool `json:"noRequest"`
 }
 
 type httpResponse struct {
@@ -341,6 +345,10 @@ func diffHttpRequests(description string, actual *adapters.RequestData, expected
 
 	if expected.Uri != actual.Uri {
 		return fmt.Errorf(`%s.uri "%s" does not match expected "%s."`, description, actual.Uri, expected.Uri)
+	}
+
+	if expected.NoRequest != actual.NoRequest {
+		return fmt.Errorf(`%s.noRequest %t does not match expected %t`, description, actual.NoRequest, expected.NoRequest)
 	}
 
 	if expected.Headers != nil {

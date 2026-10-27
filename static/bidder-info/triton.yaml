@@ -1,0 +1,29 @@
+# Triton: Triton Digital demand inside the auction (docs/adr/0005).
+#   banner      → POST OpenRTB to dsp-service's RTB endpoint {endpoint} with brand ({{.AccountID}} =
+#                 app/site.publisher.id) and ad tag ({{.AdUnit}} = tagId param) in the path, plus a
+#                 request-level ext.cxr object (station, render mode, brand, tag, placement, giv, ad_slots, pa).
+#   audio/video → no network call; a VAST wrapper bid whose VASTAdTagURI is the Triton on-demand ad
+#                 request built from the impression, the device and the placement's adRequestUrl / stid.
+# Only the dsp-service endpoint lives here; everything per placement comes from the stored imp.
+endpoint: "https://aapi.begenuin.com/goservices/dsp/rtb/{{.AccountID}}/{{.AdUnit}}"
+# Optional host-level ext.cxr values sent on every banner request, e.g.
+#   adapters.triton.extra_info: '{"giv": 0.2, "ad_slots": 3}'
+maintainer:
+  email: "nayan@begenuin.com"
+geoscope:
+  - global
+# Genuin owns the wrapper, so PBS may inject its /event impression tracker into it.
+modifyingVastXmlAllowed: true
+openrtb:
+  version: 2.6
+capabilities:
+  app:
+    mediaTypes:
+      - banner
+      - video
+      - audio
+  site:
+    mediaTypes:
+      - banner
+      - video
+      - audio

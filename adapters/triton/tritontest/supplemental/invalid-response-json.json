@@ -1,0 +1,29 @@
+{
+  "mockBidRequest": {
+    "id": "req-bad-json",
+    "app": {"publisher": {"id": "3250"}},
+    "imp": [{"id": "banner-1", "banner": {"w": 300, "h": 250}, "ext": {"bidder": {"stid": 1443132, "tagId": "t"}}}]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/t",
+        "body": {
+          "id": "req-bad-json",
+          "app": {"publisher": {"id": "3250"}},
+          "imp": [{"id": "banner-1", "banner": {"w": 300, "h": 250}}],
+          "ext": {"cxr": {"pa": 0, "stid": 1443132, "host_render": "server", "brand_id": "3250", "tag_id": "t", "placement_id": ""}}
+        },
+        "impIDs": ["banner-1"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": "not json"
+      }
+    }
+  ],
+  "expectedBidResponses": [],
+  "expectedMakeBidsErrors": [
+    {"value": "triton: invalid bid response", "comparison": "startswith"}
+  ]
+}

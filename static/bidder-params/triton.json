@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Triton Bidder Params",
+  "description": "A schema which validates params accepted by the Triton bidder: the Triton station and dsp-service ad tag of a placement, plus the per-placement settings of the two paths (banner via dsp-service RTB, audio/video via a VAST wrapper to dsp-service's VAST endpoint).",
+  "type": "object",
+  "properties": {
+    "stid": {
+      "type": "integer",
+      "description": "Triton station id (placement id on Triton's side), sent to dsp-service in ext.cxr and to Triton as stid",
+      "minimum": 1
+    },
+    "tagId": {
+      "type": "string",
+      "description": "dsp-service ad tag id of the placement, used as the {tag} path segment of the RTB endpoint",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "brandId": {
+      "type": "string",
+      "description": "dsp-service brand id of the ad tag, used as the {brand} path segment and ext.cxr.brand_id when it differs from the Prebid Server account (publisher id); defaults to the publisher id",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "hostRender": {
+      "type": "string",
+      "description": "banner: render mode; server = dsp-service finishes the creative (default), client = dsp-service hands the device a boot creative (ext.cxr.pa = 1)",
+      "enum": [
+        "client",
+        "server"
+      ]
+    },
+    "cpm": {
+      "type": "number",
+      "description": "audio/video: the price the Triton wrapper bid competes at (CPM, USD); defaults to 0.05",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    }
+  },
+  "required": [
+    "stid",
+    "tagId"
+  ]
+}

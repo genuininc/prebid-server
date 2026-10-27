@@ -1,0 +1,12 @@
+{
+  "mockBidRequest": {
+    "id": "req-no-brand",
+    "app": {"bundle": "com.begenuin.demo"},
+    "imp": [{"id": "banner-1", "banner": {"w": 300, "h": 250}, "ext": {"bidder": {"stid": 1443132, "tagId": "t"}}}]
+  },
+  "httpCalls": [],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {"value": "imp[0]: app.publisher.id or site.publisher.id (the brand) is required", "comparison": "literal"}
+  ]
+}

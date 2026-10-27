@@ -1,0 +1,201 @@
+{
+  "mockBidRequest": {
+    "id": "req-bad-params",
+    "app": {
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "imp": [
+      {
+        "id": "no-stid",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "tagId": "t"
+          }
+        }
+      },
+      {
+        "id": "no-tag",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1
+          }
+        }
+      },
+      {
+        "id": "bad-tag",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "../x"
+          }
+        }
+      },
+      {
+        "id": "bad-brand",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "t",
+            "brandId": "32/52"
+          }
+        }
+      },
+      {
+        "id": "bad-render",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "t",
+            "hostRender": "device"
+          }
+        }
+      },
+      {
+        "id": "neg-cpm",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "t",
+            "cpm": -1
+          }
+        }
+      },
+      {
+        "id": "bad-ext",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": "oops"
+        }
+      },
+      {
+        "id": "native-only",
+        "native": {
+          "request": "{}"
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "t"
+          }
+        }
+      },
+      {
+        "id": "ok",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "bidder": {
+            "stid": 1,
+            "tagId": "t"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/t",
+        "body": {
+          "id": "req-bad-params",
+          "app": {
+            "publisher": {
+              "id": "3250"
+            }
+          },
+          "imp": [
+            {
+              "id": "ok",
+              "banner": {
+                "w": 300,
+                "h": 250
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 0,
+              "stid": 1,
+              "host_render": "server",
+              "brand_id": "3250",
+              "tag_id": "t",
+              "placement_id": ""
+            }
+          }
+        },
+        "impIDs": [
+          "ok"
+        ]
+      },
+      "mockResponse": {
+        "status": 204
+      }
+    }
+  ],
+  "expectedBidResponses": [],
+  "expectedMakeRequestsErrors": [
+    {
+      "value": "imp[0]: stid must be a positive integer",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[1]: tagId is required and must match ^[A-Za-z0-9_-]{1,64}$",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[2]: tagId is required and must match ^[A-Za-z0-9_-]{1,64}$",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[3]: brandId must match ^[A-Za-z0-9_-]{1,64}$",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[4]: hostRender must be \"client\" or \"server\"",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[5]: cpm must not be negative",
+      "comparison": "literal"
+    },
+    {
+      "value": "imp[6]: invalid imp.ext.bidder",
+      "comparison": "startswith"
+    },
+    {
+      "value": "imp[7]: triton supports only banner, video and audio impressions",
+      "comparison": "literal"
+    }
+  ]
+}

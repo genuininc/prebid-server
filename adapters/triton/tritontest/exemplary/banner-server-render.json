@@ -1,0 +1,148 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "device": {
+      "ua": "GenuinApp/1.0",
+      "ip": "203.0.113.7"
+    },
+    "imp": [
+      {
+        "id": "banner-1",
+        "banner": {
+          "w": 300,
+          "h": 250
+        },
+        "ext": {
+          "data": {
+            "brandId": "3250",
+            "placementId": "pl-banner-1"
+          },
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6a3aa78ba0daccfd439648b8",
+            "hostRender": "server"
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/rtb/3250/6a3aa78ba0daccfd439648b8",
+        "headers": {
+          "Content-Type": ["application/json;charset=utf-8"],
+          "Accept": ["application/json"]
+        },
+        "body": {
+          "id": "test-request-id",
+          "app": {
+            "bundle": "com.begenuin.demo",
+            "publisher": {
+              "id": "3250"
+            }
+          },
+          "device": {
+            "ua": "GenuinApp/1.0",
+            "ip": "203.0.113.7"
+          },
+          "imp": [
+            {
+              "id": "banner-1",
+              "banner": {
+                "w": 300,
+                "h": 250
+              },
+              "ext": {
+                "data": {
+                  "brandId": "3250",
+                  "placementId": "pl-banner-1"
+                }
+              }
+            }
+          ],
+          "ext": {
+            "cxr": {
+              "pa": 0,
+              "stid": 1443132,
+              "host_render": "server",
+              "brand_id": "3250",
+              "tag_id": "6a3aa78ba0daccfd439648b8",
+              "placement_id": "pl-banner-1"
+            }
+          }
+        },
+        "impIDs": ["banner-1"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": {
+          "id": "test-request-id",
+          "bidid": "test-request-id-bid",
+          "cur": "USD",
+          "seatbid": [
+            {
+              "seat": "tgen",
+              "bid": [
+                {
+                  "id": "test-request-id-1",
+                  "impid": "banner-1",
+                  "price": 1.05,
+                  "adid": "d9qo6f1upte000a43e80",
+                  "crid": "audiohook-27646",
+                  "cid": "RUB-27646",
+                  "adomain": ["sheex.com"],
+                  "cat": ["IAB10-7"],
+                  "attr": [2],
+                  "w": 300,
+                  "h": 250,
+                  "mtype": 1,
+                  "exp": 1800,
+                  "adm": "<!doctype html><html><body data-price=\"${AUCTION_PRICE}\">player</body></html>",
+                  "nurl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/win?ad_id=d9qo6f1upte000a43e80&clearing_price=${AUCTION_PRICE}",
+                  "burl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/billing?ad_id=d9qo6f1upte000a43e80&clearing_price=${AUCTION_PRICE}",
+                  "lurl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/loss?ad_id=d9qo6f1upte000a43e80&clearing_price=${AUCTION_PRICE}&loss=${AUCTION_LOSS}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "test-request-id-1",
+            "impid": "banner-1",
+            "price": 1.05,
+            "adid": "d9qo6f1upte000a43e80",
+            "crid": "audiohook-27646",
+            "cid": "RUB-27646",
+            "adomain": ["sheex.com"],
+            "cat": ["IAB10-7"],
+            "attr": [2],
+            "w": 300,
+            "h": 250,
+            "mtype": 1,
+            "exp": 1800,
+            "adm": "<!doctype html><html><body data-price=\"1.05\">player</body></html>",
+            "nurl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/win?ad_id=d9qo6f1upte000a43e80&clearing_price=1.05",
+            "burl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/billing?ad_id=d9qo6f1upte000a43e80&clearing_price=1.05",
+            "lurl": "https://dsp.example.test/goservices/dsp/pixel/3250/6a3aa78ba0daccfd439648b8/loss?ad_id=d9qo6f1upte000a43e80&clearing_price=1.05&loss=${AUCTION_LOSS}"
+          },
+          "type": "banner"
+        }
+      ]
+    }
+  ]
+}

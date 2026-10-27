@@ -1,0 +1,84 @@
+{
+  "mockBidRequest": {
+    "id": "req-audio",
+    "app": {
+      "bundle": "com.begenuin.demo",
+      "publisher": {
+        "id": "3250"
+      }
+    },
+    "device": {
+      "ua": "GenuinApp/1.0",
+      "ip": "203.0.113.7",
+      "os": "iOS",
+      "ifa": "6D92078A-8246-4BA4-AE5B-76104861E7DC",
+      "lmt": 0
+    },
+    "user": {
+      "consent": "CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA"
+    },
+    "regs": {
+      "gdpr": 1,
+      "us_privacy": "1YNN",
+      "gpp": "DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA",
+      "gpp_sid": [
+        2,
+        6
+      ]
+    },
+    "imp": [
+      {
+        "id": "audio-1",
+        "audio": {
+          "mimes": [
+            "audio/mpeg"
+          ],
+          "startdelay": 0,
+          "maxseq": 1
+        },
+        "ext": {
+          "data": {
+            "placementId": "pl-audio-1"
+          },
+          "bidder": {
+            "stid": 1443132,
+            "tagId": "6a3aa78ba0daccfd439648b8",
+            "cpm": 1.25
+          }
+        }
+      }
+    ]
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_group_id=pl-audio-1&ad_type=preroll&bundle=com.begenuin.demo&did=6D92078A-8246-4BA4-AE5B-76104861E7DC&imp_id=audio-1&is_lat=0&os=ios&regs_ext_gdpr=1&regs_ext_gpp=DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA&regs_ext_gpp_sid=2%2C6&regs_ext_us_privacy=1YNN&req_id=req-audio&startdelay_iv=0&user_ext_consent=CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA",
+        "impIDs": [
+          "audio-1"
+        ],
+        "noRequest": true
+      },
+      "mockResponse": {
+        "status": 200
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "triton-audio-1",
+            "impid": "audio-1",
+            "price": 1.25,
+            "adm": "<VAST version=\"4.0\"><Ad id=\"triton-audio-1\"><Wrapper><AdSystem>Triton</AdSystem><VASTAdTagURI><![CDATA[https://dsp.example.test/goservices/dsp/vast/3250/6a3aa78ba0daccfd439648b8?ad_group_id=pl-audio-1&ad_type=preroll&bundle=com.begenuin.demo&did=6D92078A-8246-4BA4-AE5B-76104861E7DC&imp_id=audio-1&is_lat=0&os=ios&regs_ext_gdpr=1&regs_ext_gpp=DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA&regs_ext_gpp_sid=2%2C6&regs_ext_us_privacy=1YNN&req_id=req-audio&startdelay_iv=0&user_ext_consent=CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA]]></VASTAdTagURI><Impression></Impression><Creatives></Creatives></Wrapper></Ad></VAST>",
+            "crid": "triton:1443132",
+            "mtype": 3
+          },
+          "type": "audio"
+        }
+      ]
+    }
+  ]
+}

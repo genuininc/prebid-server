@@ -267,6 +267,7 @@ var coreBidderNames []BidderName = []BidderName{
 	BidderTrafficGate,
 	BidderTriplelift,
 	BidderTripleliftNative,
+	BidderTriton,
 	BidderTrustedstack,
 	BidderTrustX,
 	BidderUcfunnel,
@@ -655,6 +656,7 @@ const (
 	BidderTrafficGate       BidderName = "trafficgate"
 	BidderTriplelift        BidderName = "triplelift"
 	BidderTripleliftNative  BidderName = "triplelift_native"
+	BidderTriton            BidderName = "triton"
 	BidderTrustedstack      BidderName = "trustedstack"
 	BidderTrustX            BidderName = "trustx"
 	BidderUcfunnel          BidderName = "ucfunnel"
